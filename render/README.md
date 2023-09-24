@@ -36,6 +36,6 @@ for x in bubble insertion merge; do
 done
 ```
 
-| bubble - 2275 frames | insertion - 2548 frames | merge 539 frames |
-| -------------------- | ----------------------- | ---------------- |
+| bubble - 2275 frames | insertion - 2548 frames | merge - 539 frames |
+| -------------------- | ----------------------- | ------------------ |
 | ![bubble sort](img/bubble.gif) | ![insertion sort](img/insertion.gif) | ![merge sort](img/merge.gif) |
