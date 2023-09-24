@@ -21,14 +21,22 @@ var palette = color.Palette{
 }
 
 func main() {
+	rxReader := regexp.MustCompile(`([0-9]+)[,\]]`)
 	var outfn string
 	var scale int
+	var framedelay int
 	flag.StringVar(&outfn, "o", "", "output filename")
 	flag.IntVar(&scale, "s", 16, "scale (pixels/item)")
+	flag.IntVar(&framedelay, "d", 10, "frame delay in 1/00ths of a sec")
 	flag.Parse()
 
 	if scale < 1 || scale > 1024 {
 		fmt.Fprintln(os.Stderr, "invalid scale:", scale, "not between 1 and 1024")
+		os.Exit(1)
+	}
+
+	if framedelay < 0 {
+		fmt.Fprintln(os.Stderr, "invalid frame delay:", framedelay, "not greater than or equal to 0")
 		os.Exit(1)
 	}
 
@@ -45,19 +53,23 @@ func main() {
 	} else if isatty.IsTerminal(os.Stdin.Fd()) {
 		fmt.Fprintln(os.Stderr, "send input via stdin or filename")
 	}
-	rxReader := regexp.MustCompile(`([0-9]+)[,\]]`)
+	var data [][]int
+
 	scn := bufio.NewScanner(infile)
-	g := &gif.GIF{}
+	var maxv, minv int
 	for scn.Scan() {
 		parsed := rxReader.FindAllStringSubmatch(scn.Text(), -1)
 		values := make([]int, len(parsed))
-		var maxv, minv int
 		for i, x := range parsed {
 			values[i], _ = strconv.Atoi(x[1])
 			maxv = max(maxv, values[i])
 			minv = min(minv, values[i])
 		}
+		data = append(data, values)
+	}
 
+	g := &gif.GIF{}
+	for _, values := range data {
 		frame := image.NewPaletted(
 			image.Rectangle{
 				image.Point{},
@@ -65,6 +77,8 @@ func main() {
 			},
 			palette,
 		)
+		g.Image = append(g.Image, frame)
+		g.Delay = append(g.Delay, framedelay)
 		for x, v := range values {
 			x1 := (x + 1) * scale
 			x2 := x1 + scale
@@ -76,8 +90,6 @@ func main() {
 				}
 			}
 		}
-		g.Image = append(g.Image, frame)
-		g.Delay = append(g.Delay, 10)
 	}
 
 	if len(g.Image) == 0 {
