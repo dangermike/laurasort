@@ -7,7 +7,6 @@ def swap(data, a, b):
 
 
 fart = list(range(100))
-swap(fart, 3, 6)
 random.shuffle(fart)
 print(fart)
 swapcount = -1
