@@ -23,3 +23,19 @@ The resulting GIFs are _not_ optimized. If you want to reduce file sizes, pipe t
 ```bash
 go run . -s 32 img/sample.txt | gifsicle -O3 > img/sample.gif
 ```
+
+## More Examples
+
+These samples were generated
+
+```bash
+for x in bubble insertion merge; do
+    python3 ./solution/solution.py "$x" -c 100 | \
+    go run ./render -d 2 -s 2 | \
+    gifsicle -O3 -o render/img/${x}.gif;
+done
+```
+
+| bubble | insertion | merge
+| --- | --- | --- |
+| ![bubble sort](img/bubble.gif) | ![insertion sort](img/insertion.gif) | ![merge sort](img/merge.gif) |
